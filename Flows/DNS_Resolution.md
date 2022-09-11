@@ -78,6 +78,5 @@ Flow in detail:
 1. Recursive DNS stores this mapping (Web server URL to IP) in its cache and return IP to browser.
 1. Browser then uses this IP to connect to Webserver.
 
-
 # References:
 1. https://docs.microsoft.com/en-us/azure/traffic-manager/traffic-manager-how-it-works
