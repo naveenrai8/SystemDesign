@@ -7,5 +7,6 @@
 
 ## Components
 1. [DNS Resolution](./Components/DNS/DNS_Resolution.md)
+2. [Hashing](./Components/Hashing/Hashing.md)
 
 
