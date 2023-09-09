@@ -10,6 +10,7 @@
       - [Murmur3 hash](#murmur3-hash)
       - [CityHash](#cityhash)
       - [FarmHash](#farmhash)
+  - [Compare hash values](#compare-hash-values)
 
 # Hashing
 There are two types of hashing, one is cryptographic and other is non-cryptographic.
@@ -78,6 +79,8 @@ Characteristics:
 1. Its will good distributed even for a small change in the input.
 2. Does not support lexicographical sorting.
 3. It is not cryptographically secure. This means that it is not possible to use FarmHash to encrypt data.
+4. FarmHash is designed to work consistently across different platforms and architectures, including 32-bit and 64-bit systems.
+5. FarmHash comes in multiple variants, including **FarmHashFingerprint32, FarmHashFingerprint64, and FarmHashFingerprint128**, each of which produces hash values of different lengths (e.g., 32 bits, 64 bits, or 128 bits). This allows you to choose the variant that best suits your application's requirements.
 
 Applications
 
@@ -102,3 +105,22 @@ HashCode code = Hashing.farmHashFingerprint64().hashInt(1);
 ```
 [com.google.guava doc](https://guava.dev/releases/31.0-jre/api/docs/com/google/common/hash/Hashing.html)<br/>
 [com.google.guava maven repository](https://mvnrepository.com/artifact/com.google.guava/guava/32.1.2-jre)
+
+## Compare hash values
+
+Hash values are not designed to be compared but below are the ways to be used to compare:
+1. Convert to **Hexadecimal string** representation and compare.
+
+```Java
+HashCode code1 = Hashing.farmHashFingerprint64().hashInt(1);
+HashCode code2 = Hashing.farmHashFingerprint64().hashInt(2);
+
+System.out.println(code1.toString().equals(code2.toString()));
+```
+
+```
+code1 output => 54186054c3527c69
+code2 output => 0fdb6a6958a3115d
+false
+```
+2. Convert Hash values to **Base64 format** which is the representation of string and then compare.
