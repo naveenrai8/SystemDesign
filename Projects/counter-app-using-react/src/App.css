@@ -1,0 +1,22 @@
+.App {
+  text-align: center;
+}
+
+.digit {
+  font-size: 40px;
+}
+
+button {
+  font-size: 20px;
+  padding: 15px 30px;
+  width: 100px;
+  margin: 5px;
+  border-radius: 10px;
+  background-color: green;
+  color: white;
+}
+
+.resetButton {
+  background-color: rgb(67, 78, 240);
+  text-align: center;
+}
