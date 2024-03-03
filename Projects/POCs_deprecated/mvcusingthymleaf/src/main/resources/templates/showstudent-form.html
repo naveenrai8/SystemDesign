@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+<link rel="stylesheet" th:href="@{/css/demo.css}">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello world - Input Form</title>
+</head>
+<body>
+
+<form th:action="@{/studentform}" th:object="${student}" method="post">
+    <!-- both format is same.  th:field="*{firstName}" or th:field="${student.firstName}"-->
+<!--    First Name: <input type="text" th:field="*{firstName}" placeholder="First Name"><br>-->
+    First Name: <input type="text"
+                       th:field="${student.firstName}"
+                       placeholder="First Name"><br>
+    Last Name (*): <input type="text"
+                      th:field="*{lastName}"
+                      placeholder="Last Name">
+    <span th:if="${#fields.hasErrors('lastName')}"
+          th:errors="*{lastName}"
+          class="error"></span>
+<!--    <select th:field="${student.country}">-->
+<!--        <option th:value="India">India</option>-->
+<!--        <option th:value="Canada">Canada</option>-->
+
+<!--    </select>-->
+
+    <br>
+    Student Age (*): <input type="text"
+                          th:field="*{age}"
+                          placeholder="Age">
+    <span th:if="${#fields.hasErrors('age')}"
+          th:errors="*{age}"
+          class="error"></span>
+
+    <br>
+    Postal Code (*): <input type="text"
+                            th:field="*{postalCode}"
+                            placeholder="postalCode">
+    <span th:if="${#fields.hasErrors('postalCode')}"
+          th:errors="*{postalCode}"
+          class="error"></span>
+    <br>
+
+    Message (*): <input type="text"
+                            th:field="*{message}"
+                            placeholder="message">
+    <span th:if="${#fields.hasErrors('message')}"
+          th:errors="*{message}"
+          class="error"></span>
+    <br>
+
+    <select th:field="*{country}" >
+        <option th:each="tempCountry: ${countries}" th:value="${tempCountry}" th:text="${tempCountry}"></option>
+    </select>
+    <br>
+
+    <br>
+    <!--  Make the below list flexible (non hard coded)   -->
+<!--    <input type="radio" th:value="Go" th:field="${student.language}">Go</input> <br>-->
+<!--    <input type="radio" th:value="Java" th:field="${student.language}">Java</input>-->
+    <br>
+
+    <input type="radio" th:each="l: ${languages}" th:value="${l}" th:field="${student.language}" th:text="${l}"></input>
+    <input type="checkbox" th:each="l: ${languages}" th:value="${l}" th:field="${student.allLanguages}" th:text="${l}">
+    <input type="submit" value="submit">
+
+</form>
+
+</body>
+</html>

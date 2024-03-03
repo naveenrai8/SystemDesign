@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Systems Home Page</title>
+</head>
+<body>
+<h2>Systems's Home page</h2>
+<hr>
+Welcome to the Systems's home page!!
+
+<!-- display username and role -->
+<p>
+<!--  User: <span sec:authentication="principal.username"></span>-->
+<!--  <br><br>-->
+<!--  &lt;!&ndash; authorities are same as role &ndash;&gt;-->
+<!--  Role(s): <span sec:authentication="principal.authorities"></span>-->
+  We have annual holiday Caribbean cruise coming up. Register now!
+  <br>
+  Keep this trip a secret, don't tell the regular employees LOL :-)
+</p>
+
+<p>
+  <a th:href="@{/}">Go to home page</a>
+</p>
+
+<form action="#" th:action="@{/logout}" method="post">
+  <input type="submit" value="Logout">
+</form>
+
+</body>
+</html>
