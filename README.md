@@ -14,3 +14,6 @@
 
 1. [Counter App using React](Projects/counter-app-using-react/)
 2. [Todo App](Projects/ToDoApp)
+3. TCP Client and Server
+   1. [TCP Client\Server in Java](Projects/TCP_Server/Java/tcp_server) 
+
