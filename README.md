@@ -2,7 +2,7 @@
 
 ## System Design Topics
 
-1. [Metric and Alerting system](./System_Design_Topics/Metric_Alerting_System/Overiew.md)
+1. [Metric and Alerting system](./System_Design_Topics/Metric_Alerting_System/Overview.md)
    ![](./System_Design_Topics/Metric_Alerting_System/Images/System_design-Page-4.jpg)
 2. [Design Url Shortener system](./System_Design_Topics/Url_Shortener_System/Overview.md)
 3. [Design Rate Limiter service](./System_Design_Topics/Rate_Limiter_Service/Overview.md)
