@@ -11,7 +11,7 @@ import java.util.List;
 public class RedisRunner {
     private static final Logger logger = LoggerFactory.getLogger(RedisRunner.class);
 
-    public static void main(String[] args) {
+    public void redisRunnerMain() {
         String channelName = "person-name-channel";
         try (JedisPool jedisPool = new JedisPool("localhost", 6379)) {
             try (Jedis jedis = jedisPool.getResource()) {
