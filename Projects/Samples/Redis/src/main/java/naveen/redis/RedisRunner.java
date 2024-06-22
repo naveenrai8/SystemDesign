@@ -10,10 +10,12 @@ import java.util.List;
 
 public class RedisRunner {
     private static final Logger logger = LoggerFactory.getLogger(RedisRunner.class);
+    private String host = "naveen-redis.redis.cache.windows.net";
+    private int port = 6379;
 
     public void redisRunnerMain() {
         String channelName = "person-name-channel";
-        try (JedisPool jedisPool = new JedisPool("localhost", 6379)) {
+        try (JedisPool jedisPool = new JedisPool(host, port)) {
             try (Jedis jedis = jedisPool.getResource()) {
                 jedis.set("name", "naveen");
                 logger.info(jedis.get("name"));
