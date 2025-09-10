@@ -10,7 +10,7 @@ its a hashing technique in which small/relative small number of key movement hap
 2. Mapping of key to server is independent of number of servers.
 3. It allows to map key to server based upon its access pattern.
 
-### Question: Can we progress to consistent hashing from scrtach??
+<span style="color:red;">Question: Can we progress to consistent hashing from scrtach??</span>
 
 Lets start from scratch
 
