@@ -191,6 +191,47 @@ cd bin
 
 ```
 
+#### debezium connector
+
+```bash
+Creating connector for debezium-demo database:
+
+$ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" http://localhost:8083/connectors/ -d '
+{
+  "name": "debezium-demo-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.mysql.MySqlConnector",
+    "tasks.max": "1",
+    "database.hostname": "localhost",
+    "database.port": "3306",
+    "database.user": "root",
+    "database.password": "naveen",
+    "database.server.id": "10101",
+    "database.server.name": "mysql1",
+    "database.include.list": "debezium_demo",
+    "database.history.kafka.bootstrap.servers": "localhost:9092",
+    "schema.history.internal.kafka.bootstrap.servers": "localhost:9092",
+    "database.history.kafka.topic": "schema-changes.debezium_demo",
+    "schema.history.internal.kafka.topic": "schema-changes.debezium_demo",
+    "key.converter": "io.confluent.connect.avro.AvroConverter",
+    "value.converter": "io.confluent.connect.avro.AvroConverter",
+    "key.converter.schema.registry.url": "http://localhost:8081",
+    "value.converter.schema.registry.url": "http://localhost:8081",
+    "topic.prefix": "mytopicprefix"
+  }
+}'
+
+Checking the connectors:
+
+$ curl -XGET http://localhost:8083/connectors
+
+$ curl -XGET http://localhost:8083/connectors?expand=status
+-> Retrieves additional state information for each of the connectors and its tasks
+
+$ curl -XGET http://localhost:8083/connectors?expand=info
+-> Returns the metadata of each of the connectors such as the configuration, task information and type of connector
+```
+
 ## POC
 
 Create project on Propogate Business entity Create/Update/Delete to other systems using Debezium.
