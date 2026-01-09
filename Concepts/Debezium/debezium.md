@@ -237,3 +237,7 @@ $ curl -XGET http://localhost:8083/connectors?expand=info
 Create project on Propogate Business entity Create/Update/Delete to other systems using Debezium.
 
 [Project](../../Softwares/Debezium/update-business-entity/)
+
+# References
+
+[Debezium for mysql udemy counrse](https://www.udemy.com/course/debezium-for-mysql/)
