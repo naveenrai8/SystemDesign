@@ -10,6 +10,6 @@
 
 1. [Debezium (CDD: Change data capture)](./Softwares/Debezium/)
 
+## System design topics
 
-## Tech Blog
-1. [Meta Tech blog - Cache Made consistent](https://github.com/naveenrai8/obsidian-vaults/blob/main/System-Design/Tech%20Blogs/Cache%20made%20consistent/Cache%20Made%20Consistent.md)
+1. [Design posting a review for a product system](./System-Designs/Design-Review-Posting-Service/HLD.md)
