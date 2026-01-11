@@ -2,9 +2,12 @@
 
 ## Requirement
 
-- User able to post a review for a product
-- User able to view the review posted on a product
-- User able to view its previous posts
+- An authenticated User able to post a review for a product which it has purchased before.
+- User is allowed to submit one review per product.
+- Upon successful review submission, the data must be persisted.
+- An authenticated user is allowed to get the reviews associated only with the products previously purchased by that user.
+- The reviews associated with the authenticated user must be returned in reverse chronological order.
+- The system shall support pagination or limits on the number of reviews returned per request.
 
 ## Non Functional Requirements
 
@@ -24,6 +27,12 @@
   - Few user (0.1% of total active users) post a review
   - Very few users view their previous posts
   - Whenever product page is displayed, reviews are shown at the bottom
+
+### Out of scope for this design
+
+- Flow to explain user authentication.
+- Flow to verify user is providing review for the product he purchased before.
+- Flow of validation of Product review (e.g. profanity, length etc)
 
 ## High Level Design
 
