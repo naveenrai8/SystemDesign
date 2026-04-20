@@ -60,7 +60,6 @@
 ### Scale Db to handle the load
 
 ![HLD-Scale-Db](./images/HLD-Scale-Db.png)
-![HLD-Scale-Db](images/HLD-Scale-Db.png)
 
 ### Ensuring regional low latency
 
