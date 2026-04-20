@@ -1,51 +1,14 @@
+![HLD-Final](./images/HLD-Final.png)
+
 # Requirements
 
 1. User provides the long url and get a short url.
 2. User input the short url and get directed to long url.
 3. User can provide custom alias as short url.
 
-# Questions
+# Questions asked to the Interviewer
 
-## Core functionality
-
-1. Redirect shortUrl SLA? p50 or p99?
-2. Character set -> Base62?
-3. Analytics required? (per redirect)
-4. support unique short url generation for next 10 years?
-5. Assumption -> no support of delete and edit long url
-
-## Traffic and load
-
-1. read to write ratio: 10:1 (read heavy system)?
-2. 10M writes per day?
-3. traffic 10x during peak time?
-4. Storage -> 10 years?
-5. Do we expect traffic skew on read path?
-
-## Geo and availability
-
-1. Global reads and local writes?
-2. Failover expectation?
-
-## Consistency and correctness
-
-1. Strong consistency on Write path (including custom alias)?
-2. Eventual consistency on Read path?
-
-## Access Pattern or Secondary Features
-
-1. User to list all the short url?
-2. Search by long or short url?
-
-## Abuse and Security
-
-1. short url hard to guess?
-2. Rate limiting needed?
-3. validate the long url? (length, spam, malicious etc)
-
-## Cost and optimization
-
-1. I'll assume 20 - 30ms global read latency with caching/CDN.
+[Questions](./Questions-asked.md)
 
 # Functional Requirements
 
@@ -89,3 +52,53 @@
       3. user_id = 20 bytes (for guest user, unique id generated and store in browser. This acts as idempotent key)
       4. total = 1200 bytes per entry
    2. 36 B \* 1.2 \* 10ˆ3 bytes = 40 TB for 10 years
+
+## High Level design
+
+![HLD-Meeting-Functional-Requirements](./images/HLD-Meeting-Functional-Requirements.png)
+
+### Scale Db to handle the load
+
+![HLD-Scale-Db](./images/HLD-Scale-Db.png)
+![HLD-Scale-Db](images/HLD-Scale-Db.png)
+
+### Ensuring regional low latency
+
+![HLD-Regional-Low-Latency](./images/HLD-Regional-Low-Latency.png)
+
+### Handle Cache Stampede
+
+![HLD-Handling-Cache-Stampede](./images/HLD-Handling-Cache-Stampede.png)
+
+### Handle Hot Keys with Sharded Redis Cache
+
+![HLD-Handling-Hot-Keys-Sharded-Redis-Cache](./images/HLD-Handling-Hot-Keys-Sharded-Redis-Cache.png)
+
+### Handle Hot Keys with Random Suffix
+
+![HLD-Handling-Hot-Keys-Random-Suffix](./images/HLD-Handling-Hot-Keys-Random-Suffix.png)
+
+### Final Version
+
+![HLD-Final](./images/HLD-Final.png)
+
+### Short Url Ids
+
+[Alternate Options explored](./Short-Url-Ids-Alternate-Options.md)
+
+#### Snowflake + Permutated Id
+
+#### Steps
+
+1. Generate Snowflake id which is 64 bits or 8 bytes
+2. Get 11 character Bas2 62 sized Short Url
+   1. For 64 bits and Base 62 characters for short url,
+      1. we get 5.95 bits per character
+         1. 62 is between 2^5 and 2^6
+      2. for 64 bits, we need 11 characters
+         1. 64 / 5.95 = ~10.75
+3. Permutate it using Feistel_cipher (look at [References](#references) section) to ensure zero predictability.
+
+# References
+
+1. [Feistel_cipher](https://en.wikipedia.org/wiki/Feistel_cipher)
