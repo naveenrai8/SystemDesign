@@ -55,6 +55,26 @@
 
 ## High Level design
 
+Start with the basic high level design which satisfy the functional requirements.
+
+### Create Short Url Flow
+
+1. Call lands to Short Url service
+2. It fetches the short url id from the id generator service.
+3. Saves the information in the db
+   1. long url
+   2. short url
+   3. other metadata
+4. Once saved, it returns the short url back to the user.
+
+### Redirect shorl url
+
+1. When user enters the short url at the browser, call lands to our service.
+2. Short url service fetches the long url from the database which matches the short url (where condition).
+3. It sends the 301 redirect http status with long url insider http header with key = location.
+4. User's browser fetches the long url from the header and redirect.
+
+Apparently, this just satisfy the requirements
 ![HLD-Meeting-Functional-Requirements](./images/HLD-Meeting-Functional-Requirements.png)
 
 ### Scale Db to handle the load
