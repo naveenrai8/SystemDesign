@@ -12,4 +12,7 @@
 
 ## System design topics
 
-1. [Design posting a review for a product system](./System-Designs/Design-Review-Posting-Service/HLD.md)
+1. [Design Short Url](./System-Designs/Design-Short-Url/Version-1.md)
+   ![](./System-Designs/Design-Short-Url/images/Final.png)
+2. [Design posting a review for a product system](./System-Designs/Design-Review-Posting-Service/HLD.md)
+   ![](./System-Designs/Design-Review-Posting-Service/images/Dynamodb-GSI-2.png)
