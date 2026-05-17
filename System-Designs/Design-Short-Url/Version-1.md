@@ -1,4 +1,6 @@
-![HLD-Final](./images/HLD-Final.png)
+# Final High Level Design
+
+![HLD-Final](./images/Final.png)
 
 # Requirements
 
@@ -57,7 +59,11 @@
 
 Start with the basic high level design which satisfy the functional requirements.
 
-### Create Short Url Flow
+### Meeting the functional requirements
+
+![HLD-Meeting-Functional-Requirements](./images/Meeting-Functional-Requirements.png)
+
+#### Create Short Url Flow
 
 1. Call lands to Short Url service
 2. It fetches the short url id from the id generator service.
@@ -67,43 +73,178 @@ Start with the basic high level design which satisfy the functional requirements
    3. other metadata
 4. Once saved, it returns the short url back to the user.
 
-### Redirect shorl url
+#### Redirect shorl url
 
 1. When user enters the short url at the browser, call lands to our service.
 2. Short url service fetches the long url from the database which matches the short url (where condition).
 3. It sends the 301 redirect http status with long url insider http header with key = location.
 4. User's browser fetches the long url from the header and redirect.
 
-Apparently, this just satisfy the requirements
-![HLD-Meeting-Functional-Requirements](./images/HLD-Meeting-Functional-Requirements.png)
+👍 this just satisfy the functional requirements.
+👉 Now scale the system by focusing on one component at a time.
 
-### Scale Db to handle the load
+### 👉 Scale Db to handle the load
 
-![HLD-Scale-Db](./images/HLD-Scale-Db.png)
+Lets handle the non functional requriments by Scaling the database.
+
+![HLD-Scale-Db](./images/Scale-Db.png)
+
+#### Create Short Url Flow
+
+- call lands to Short Url service
+- it calls Id generator to get the unique short Url
+- save the mapping the database
+  - get db instance by using long_url
+  - save the entry in the db
+- return the short url to the user
+
+#### Redirect Short Url
+
+- call lands to Short Url service
+- fetches the mapping from the database
+- return the long url to the short Url service
+- redirect the user by setting Location header in the response.
+
+#### Sync between two databases using CDC
+
+- Used debezium here which reads the messages from the WAL
+- push them in the Kafka
+- database consumer reads the message from the kafka
+  - add the entry in the db
 
 ### Ensuring regional low latency
 
-![HLD-Regional-Low-Latency](./images/HLD-Regional-Low-Latency.png)
+Fetch the data from the Redis cluster to ensure low latency.
+
+![HLD-Regional-Low-Latency](./images/Regional-Low-Latency.png)
+
+#### CDC (Change Data capture)
+
+- Used debezium here which reads the messages from the WAL
+- push them in the Kafka
+- Consumers
+  - database consumer
+    - reads the message from the kafka
+    - add the entry in the db
+  - Redis consumer
+    - read message from kafka
+    - add it in the redis cache
 
 ### Handle Cache Stampede
 
-![HLD-Handling-Cache-Stampede](./images/HLD-Handling-Cache-Stampede.png)
+Cache stampede happens when there is cache miss and all servers or threads go to the database to fetch it. These causes load at the database which may result in crash.
 
-### Handle Hot Keys with Sharded Redis Cache
+![HLD-Handling-Cache-Stampede](./images/Handling-Cache-Stampede.png)
 
-![HLD-Handling-Hot-Keys-Sharded-Redis-Cache](./images/HLD-Handling-Hot-Keys-Sharded-Redis-Cache.png)
+#### Redirect Short Url (when cache hit)
 
-### Handle Hot Keys with Random Suffix
+- call lands to Short Url service
+- fetches the mapping from the cache if present
+- return the long url to the short Url service
+- redirect the user by setting Location header in the response.
 
-![HLD-Handling-Hot-Keys-Random-Suffix](./images/HLD-Handling-Hot-Keys-Random-Suffix.png)
+#### Redirect Short Url (when cache miss)
+
+- call lands to Short Url service
+- fetches the mapping from the cache
+  - cache miss
+  - try to get the lock
+  - if not acquired, do exponentail backoff with jitter
+  - else,
+    - get the mapping from the short_url table
+    - update the cache
+- return the long url to the short Url service
+- redirect the user by setting Location header in the response.
+
+### Handle Hot Keys
+
+#### with Sharded Redis Cache
+
+Instead of having fewer redis cache instances, throw more instances within cluster which somewhat handles the load.
+👍 It can handle the hot keys problem upto a level without going into the complexity of it.
+❌ It can't handle once it cross the limit.
+
+![HLD-Handling-Hot-Keys-Sharded-Redis-Cache](./images/Handling-Hot-Keys-Sharded-Redis-Cache.png)
+
+#### with Random Suffix
+
+This technique is used when previous technique of handling the hot key fails. In this case, a random suffix (between 1 - N. e.g. N = 10) with key.
+👍 It can handle the hot keys problem well.
+❌ It introduces the complexity in the system.
+❌ Requires extra knowledge about which keys are hot keys. We can use any db for the same.
+
+![HLD-Handling-Hot-Keys-Random-Suffix](./images/Handling-Hot-Keys-Random-Suffix.png)
+
+#### using CDN
+
+##### Redirect Short Url (when CDN cache hit)
+
+- User connects with CDN
+- it redirects the user to long url.
+
+##### CDN (update cache)
+
+- CDN call lands to Short Url service
+- fetches the mapping from the cache
+  - cache miss
+  - try to get the lock
+  - if not acquired, do exponentail backoff with jitter
+  - else,
+    - get the mapping from the short_url table
+    - update the cache
+- return the long url to the short Url service
+- redirect the user by setting Location header in the response.
+
+👍 No need to handle the hot keys problem using random suffix
+👍 CDNs are designed to handle the hot keys problem well.
+👍 No need to handle cache stampede problem which is handle at CDN side.
+❌ It introduces the cost to the system.
+
+![HLD-Handling-Hot-Keys-Random-Suffix](./images/Handling-Hot-Keys-Using-CDN.png)
+
+### Handle Non existing Short Url
+
+#### ❌ Without Handling of Non existing Short url
+
+- Call lands to CDN first, it couldn't find entry in its cache
+- CDN calls to Short Url Service,
+  - it first looks for it in Redis -> cache miss
+  - it goes to database -> no entry found
+- return NOT FOUND to CDN
+- CDN returns the appropriate error to the user.
+
+#### 👍 Handling of Non existing Short url
+
+- Call lands to CDN first, it couldn't find entry in its cache
+- CDN calls to Short Url Service,
+  - it first looks for it in Redis -> cache miss
+  - it looks entry in the bloom filter
+    - Since its probablistic, it may fail to identify the non existence of the given short url.
+  - it goes to database -> no entry found
+- return NOT FOUND to CDN
+- CDN returns the appropriate error to the user.
+
+👍 Bloom filter handles the non existance short url and prevent database from crashing
+🤔 Bloom filter doesn't completely eliminate the db call.
+❌ It introduces the cost to the system by adding more redis instances for Bloom filter.
+
+![HLD-Handling-Hot-Keys-Random-Suffix](./images/Handling-Non-Existing-Url.png)
 
 ### Final Version
 
-![HLD-Final](./images/HLD-Final.png)
+![HLD-Final](./images/Handling-Non-Existing-Url.png)
 
-### Short Url Ids
+# Id Generator Service
 
-[Alternate Options explored](./Short-Url-Ids-Alternate-Options.md)
+There are multiple options to select the ids.
+
+1. Random Id
+2. Sequential ID
+3. UUID
+4. ULID
+5. Snowflake
+
+Each of these have some issue. (we'll cover separately)
 
 #### Snowflake + Permutated Id
 
@@ -117,6 +258,10 @@ Apparently, this just satisfy the requirements
       2. for 64 bits, we need 11 characters
          1. 64 / 5.95 = ~10.75
 3. Permutate it using Feistel_cipher (look at [References](#references) section) to ensure zero predictability.
+
+👍 The Id generated is almost impossible to guess.
+👍 We dont store this permuted id in the database.
+👍 This permuted id generated is reversible.
 
 # References
 
